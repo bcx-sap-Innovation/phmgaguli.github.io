@@ -1,101 +1,113 @@
-function UI5(changedProperties, that) {
-    var that_ = that;
+(function()  {
+    let tmpl = document.createElement('template');
+    tmpl.innerHTML = `
+        <style>
+            .datasource {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-    div = document.createElement('div');
-    widgetName = that._export_settings.name;
-    div.slot = "content_" + widgetName;
+            .datasource > div {
+                display: inline-block;
+                vertical-align: middle;
+            }
 
-    var restAPIURL = that._export_settings.restapiurl;
-    console.log("restAPIURL: " + restAPIURL);
+            .data-age, .refresh-timer {
+                margin: 0px 12px;
+            }
 
-    if (that._firstConnectionUI5 === 0) {
-        console.log("--First Time --");
+            .data-age > * {
+                display: inline-block;
+                vertical-align: middle;
+            }
 
-        let div0 = document.createElement('div');
-        div0.innerHTML = '<?xml version="1.0"?><script id="oView_' + widgetName + '" name="oView_' + widgetName + '" type="sapui5/xmlview"><mvc:View xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" height="100%" controllerName="myView.Template"><l:VerticalLayout class="sapUiContentPadding" width="100%"><l:content><Input id="input"  placeholder="Enter partner number..." liveChange=""/></l:content><Button id="buttonId" class="sapUiSmallMarginBottom" text="Get Score" width="150px" press=".onButtonPress" /></l:VerticalLayout></mvc:View></script>';
-        _shadowRoot.appendChild(div0);
+            .refresh-timer > * {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        </style>
+        <div class="datasource">
+            <div class="data-age">
+                <div class="label">Last Refreshed:</div>
+                <div class="value">Loading</div>
+            </div>
+            <div class="refresh-timer">
+                <div class="label">Next Refresh:</div>
+                <div class="value">Never</div>
+                <button id="refresh">Refresh Now</button>
+            </div>
+        </div>
+    `;
 
-        let div1 = document.createElement('div');
-        div1.innerHTML = '<div id="ui5_content_' + widgetName + '" name="ui5_content_' + widgetName + '"><slot name="content_' + widgetName + '"></slot></div>';
-        _shadowRoot.appendChild(div1);
-
-        that_.appendChild(div);
-
-        var mapcanvas_divstr = _shadowRoot.getElementById('oView_' + widgetName);
-
-        Ar.push({
-            'id': widgetName,
-            'div': mapcanvas_divstr
-        });
-        console.log(Ar);
-    }
-
-    sap.ui.getCore().attachInit(function() {
-        "use strict";
-
-        //### Controller ###
-        sap.ui.define([
-            "jquery.sap.global",
-            "sap/ui/core/mvc/Controller",
-            "sap/m/MessageToast",
-            'sap/m/MessageBox'
-        ], function(jQuery, Controller, MessageToast, MessageBox) {
-            "use strict";
-
-            return Controller.extend("myView.Template", {
-
-                onButtonPress: function(oEvent) {
-
-                    var partnernumber = oView.byId("input").getValue(); //"0004540866"
-                    console.log(partnernumber);
-
-                    $.ajax({
-                        url: restAPIURL,
-                        type: 'POST',
-                        data: $.param({
-                            "partnernumber": partnernumber
-                        }),
-                        contentType: 'application/x-www-form-urlencoded',
-                        success: function(data) {
-                            console.log(data);
-                            _score = data;
-
-                            that._firePropertiesChanged();
-                            this.settings = {};
-                            this.settings.score = "";
-
-                            that.dispatchEvent(new CustomEvent("onStart", {
-                                detail: {
-                                    settings: this.settings
-                                }
-                            }));
-
-                        },
-                        error: function(e) {
-                            console.log("error: " + e);
-                        }
-                    });
+    customElements.define('com-sap-sample-prodsimapi1', class PRODSIMAPI1 extends HTMLElement {
+        constructor() {
+            super();
+                this.appendChild(tmpl.content.cloneNode(true));
+    
+                this._props = {
+                    JSONUrl: "https://www.rfs.nsw.gov.au/feeds/majorIncidents.json",
+                    RefreshTime: 300
+                };
+    
+                //Get refrences to our root element
+                this.$div = this.querySelector('div.datasource');
+    
+                //Add the handler for our refresh button 
+                this.$div.querySelector('#refresh').onclick = (e) => this.refresh();
+            }
+            
+            refresh() {
+                if(this._props["JSONUrl"]) {
+                    this.updateData(this._props["JSONUrl"])
                 }
-            });
-        });
+            }
+    
+            updateData(url) {
+                console.log(url);
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        this._rawData = data;
+                        this.startRefreshCountdown();
 
-        console.log("widgetName:" + widgetName);
-        var foundIndex = Ar.findIndex(x => x.id == widgetName);
-        var divfinal = Ar[foundIndex].div;
-
-        //### THE APP: place the XMLView somewhere into DOM ###
-        var oView = sap.ui.xmlview({
-            viewContent: jQuery(divfinal).html(),
-        });
-
-        oView.placeAt(div);
-
-        if (that_._designMode) {
-            oView.byId("buttonId").setEnabled(false);
-            oView.byId("input").setEnabled(false);
-        } else {
-            oView.byId("buttonId").setEnabled(true);
-            oView.byId("input").setEnabled(true);
+                        const event = new Event("onDataUpdate");
+                        this.dispatchEvent(event);
+                    });
+            }
+    
+            startRefreshCountdown() {
+                if(this._refreshTimeout) clearTimeout(this._refreshTimeout);
+    
+                this._refreshTimeout = setTimeout(() => this.refresh(), this._props["RefreshTime"] * 1000);
+    
+                const end = new Date().getTime() + (this._props["RefreshTime"] * 1000);
+    
+                if(this._countdownInterval) clearInterval(this._countdownInterval);
+    
+                this._countdownInterval = setInterval(() => {
+                    let now = new Date().getTime();
+                    let distance = end - now;
+    
+                    let timestring = distance > 60000 ? Math.floor(distance / (1000 * 60)) + " Minutes" : Math.floor(distance / (1000)) + " Seconds";
+    
+                    this.$div.querySelector(".refresh-timer .value").innerText = timestring; 
+                }, 1000);
+            }
+    
+            onCustomWidgetBeforeUpdate(oChangedProperties) {
+                let oldUrl = this._props['JSONUrl'];
+                let newUrl = oChangedProperties['JSONUrl'];
+    
+                if(newUrl != oldUrl) {
+                    this.updateData(newUrl);
+                }
+    
+                this._props = { ...this._props, ...oChangedProperties};
         }
+
+
     });
-}
+    
+})();
