@@ -1,0 +1,78 @@
+{
+    "id": "com.sap.sample",
+	"version": "1.0.0",
+	"name": "RSS Widget",
+	"description": "A RSSDataSource widget",
+	"newInstancePrefix": "RSSDataSource",
+	"icon": "",
+	"vendor": "SAP",
+	"eula": "",
+	"license": "",
+	"webcomponents": [
+		{
+			"kind": "main",
+			"tag": "com-sap-sample",
+			"url": "https://phmgaguli.github.io/rssDataSource/rss-data.js",
+			"integrity": "",
+			"ignoreIntegrity": true
+		},
+		{
+			"kind": "styling",
+			"tag": "com-sap-sample",
+			"url": "https://phmgaguli.github.io/rssDataSource/rss-data.js",
+			"integrity": "",
+			"ignoreIntegrity": true
+		}
+	],
+	"properties": {     
+		"label": {
+			"type": "string",
+			"description": "label",
+			"default": "Label"
+		},
+		"value": {
+			"type": "integer",
+			"description": "value",
+			"default": 10
+		}
+	},
+	"methods": {         
+		"setValue": {
+			"description": "Sets the gauge value.",
+			"parameters": [
+				{
+					"name": "newValue",
+					"type": "integer",
+					"description": "The new gauge value."
+				}
+			],
+			"body": "this.value = newValue;"
+		},
+		"getValue": {
+			"returnType": "integer",
+			"description": "Returns the gauge value",
+			"body": "return this.value;"
+		},
+		"setLabel": {
+			"description": "Sets the label value.",
+			"parameters": [
+				{
+					"name": "newLabel",
+					"type": "string",
+					"description": "The new label value."
+				}
+			],
+			"body": "this.label = newLabel;"
+		},
+		"getLabel": {
+			"returnType": "string",
+			"description": "Returns the gauge value",
+			"body": "return this.label;"
+		}
+	},
+	"events": {
+		"onClick": {
+			"description": "Called when the user clicks the Colored Box."
+		}
+	}
+}
