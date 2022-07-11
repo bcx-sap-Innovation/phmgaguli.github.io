@@ -262,40 +262,76 @@
 
                     onButtonPress: function(oEvent) {
 
-                        var product = oView.byId("input").getValue();
+                        // var product = oView.byId("input").getValue();
 
+              
+                        var CLIENT_SECRETS = 'NzBhOTQ2OWItYWVmZC00ZmZmLWIxMWEtODQwNTk3ZThmNjY1OklhVzAzQkZWMG84azBIYXc5OFpQR0hlMHVZ';
+                    
                         $.ajax({
-                            url: restAPIURL,
-                            type: 'GET',
-                            data: $.param({
-                                "product": product
-                            }),
-                            contentType: 'application/x-www-form-urlencoded',
+                            type: 'POST',
+                            headers: {
+                                "Authorization": "Basic " + CLIENT_SECRETS,
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            url: "https://oauth2.c-07113c9.kyma.ondemand.com/oauth2/token",
+                            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                            crossDomain: true,
+                            cache: true,
+                            dataType: 'json',
+                            data: {
+                                scope: 'read',
+                                grant_type: 'client_credentials',
+                            },
+                    
                             success: function(data) {
-                                let result = '';
-                                for (let i = 0; i < data['topn'].length; i++) {
-                                    result = result.concat(data['topn'][i])
-                                }
-                                _score = data["topn"];
-                                _topn =  data["topn"];
-                                let concatcoords = '';
-                                _coords = concatcoords.concat(data["x_coords"], ";" , data["y_coords"], ";" , data["z_coords"]);
-                                const datasetarray = _coords.split(';');
-                                that._firePropertiesChanged();
-                                this.settings = {};
-                                this.settings.score = "";
-                                this.settings.topn = "";
-                                this.settings.coords = "";
-
-                                that.dispatchEvent(new CustomEvent("onStart", {
-                                    detail: {
-                                        settings: this.settings
+                                console.log(data);
+                    
+                                var access_token = data.access_token;
+                    
+                                $.ajax({
+                                    url: restAPIURL,
+                                    type: 'GET',
+                                    headers: {
+                                        "Authorization": "Bearer " + access_token,
+                                        "Content-Type": "application/x-www-form-urlencoded"
+                                    },
+                                    data: $.param({
+                                        "product": product
+                                    }),
+                                    
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    success: function(data) {
+                                        let result = '';
+                                        for (let i = 0; i < data['topn'].length; i++) {
+                                            result = result.concat(data['topn'][i])
+                                        }
+                                        _score = data["topn"];
+                                        _topn =  data["topn"];
+                                        let concatcoords = '';
+                                        _coords = concatcoords.concat(data["x_coords"], ";" , data["y_coords"], ";" , data["z_coords"]);
+                                        const datasetarray = _coords.split(';');
+                                        that._firePropertiesChanged();
+                                        this.settings = {};
+                                        this.settings.score = "";
+                                        this.settings.topn = "";
+                                        this.settings.coords = "";
+        
+                                        that.dispatchEvent(new CustomEvent("onStart", {
+                                            detail: {
+                                                settings: this.settings
+                                            }
+                                        }));
+        
+                                    },
+                                    error: function(e) {
+                                        console.log("error: " + e);
                                     }
-                                }));
-
+                                });
+                    
                             },
                             error: function(e) {
-                                console.log("error: " + e);
+                                this_.runNext();
+                                console.log(e.responseText);
                             }
                         });
                     }
