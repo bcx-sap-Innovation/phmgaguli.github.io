@@ -404,7 +404,7 @@
                     
     
                     var trace1 = {
-                        x: x_data, y: y_data, z: z_data,myProps,
+                        myProps,
                         mode: 'markers',
                         marker: {
 
@@ -419,7 +419,7 @@
                         type: 'scatter3d'
                     };	
                     var trace2 = {
-                        x: [ann_x], y: [ann_y], z: [ann_z],
+                        
                         mode: 'markers',
                         marker: {
                             size: 12,
@@ -429,7 +429,7 @@
                             opacity: 0.8},
                         type: 'scatter3d'
                     };	
-                    var data = [trace1, trace2, myProps["label"]];
+                    var data = [trace1, trace2];
                     var selProdDesc = "Selected Product";
                     //var myProps = markers;
                    
