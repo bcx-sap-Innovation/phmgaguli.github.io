@@ -275,13 +275,13 @@
                                 console.log(data)
                                 let result = '';
                                 for (let i = 0; i < data['topn'].length; i++) {
-                                    console.log(data['topn'])
+                                    //console.log(data['topn'])
                                     result = result.concat(data['topn'][i])
                                 }
                                 _score = data["similar products"];
                                 _topn =  data["topn"];
                                 let concatcoords = '';
-                                //_coords = concatcoords.concat(data["x_coords"], ";" , data["y_coords"], ";" , data["z_coords"], ";" , data["similar products"]);
+                                _coords = concatcoords.concat(data["topn"]);
                                 const datasetarray = _coords.split(';');
                                 that._firePropertiesChanged();
                                 this.settings = {};
