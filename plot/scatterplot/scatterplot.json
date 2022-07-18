@@ -4,7 +4,7 @@
 	"name": "Scatter Plot",
 	"description": "A ScatterPlot",
 	"newInstancePrefix": "scatterplot",
-	"icon": "https://phmgaguli.github.io/scatterplot/scatterplot.png",
+	"icon": "https://phmgaguli.github.io/plot/scatterplot/scatterplot.png",
 	"vendor": "BCX",
 	"eula": "",
 	"license": "",
@@ -12,7 +12,7 @@
 		{
 			"kind": "main",
 			"tag": "com-bcx-widget-scatterplot",
-			"url": "https://phmgaguli.github.io/scatterplot/scatterplot.js",
+			"url": "https://phmgaguli.github.io/plot/scatterplot/scatterplot.js",
 			"integrity": "",
 			"ignoreIntegrity": true
 		}
