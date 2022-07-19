@@ -278,7 +278,7 @@
                                     //console.log(data['topn'])
                                     result = result.concat(data['topn'][i])
                                 }
-                                _score = data["similar products"];
+                                //_score = data["similar products"];
                                 _topn =  data["topn"];
                                 let concatcoords = '';
                                 _coords = concatcoords.concat(data["x_coords"], ";" , data["y_coords"], ";" , data["z_coords"]);
