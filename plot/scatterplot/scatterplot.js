@@ -431,7 +431,6 @@
     
                     var layout = { 
                                 hovermode: 'closest',
-                                
                                 showlegend: false,
                                 height: "800",
                                 margin: {l: 20, r: 0, b: 0, t: 0},
@@ -440,6 +439,9 @@
                                     yaxis: {title: ""},
                                     zaxis: {title: ""},
                                     annotations: [{
+                                        x: ann_x,
+                                        y: ann_y,
+                                        z: ann_z,
                                         text: selProdDesc,
                                         ax: 0,
                                         ay: -50,
